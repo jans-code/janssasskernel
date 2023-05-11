@@ -1,6 +1,9 @@
 #!/usr/bin/env python
+import os
+import shutil
 from ipykernel.kernelbase import Kernel
-import os, shutil
+
+workingdir = "/tmp/sasskernel/"
 
 class janssasskernel(Kernel):
     implementation = 'IPython'
@@ -16,15 +19,27 @@ class janssasskernel(Kernel):
 
     def do_execute(self, code, silent, store_history=True, user_expressions=None,
                    allow_stdin=False):
-        if not silent:            
-            workingdir = "/tmp/sasskernel/"
+        if not silent:
+            if os.path.exists(workingdir):
+                shutil.rmtree(workingdir)
             os.mkdir(workingdir)
-            with open(workingdir + "sassfile.scss", "w") as f:
+            code = code.strip()
+            if code[:6].lower() == '%%scss':
+                code = code[6:]
+                with open(workingdir + "sassfile.scss", "w") as f:
                     f.write(code)
-            os.system('sass --no-source-map ' + workingdir + 'sassfile.scss '  + workingdir + 'cssfile.css')
-            with open(workingdir + "cssfile.css") as f:
+                os.system('sass --no-source-map ' + workingdir + 'sassfile.scss '  + workingdir + 'cssfile.css')
+                with open(workingdir + "cssfile.css", 'r', encoding='utf-8') as f:
                     solution = f.read()
-            shutil.rmtree(workingdir)
+            else:
+                if code[:6].lower() == '%%sass':
+                    code = code[6:]
+                with open(workingdir + "scssfile.sass", "w") as f:
+                    f.write(code)
+                os.system('sass --no-source-map ' + workingdir + 'scssfile.sass '  + workingdir + 'cssfile.css')
+                with open(workingdir + "cssfile.css", 'r', encoding='utf-8') as f:
+                    solution = f.read()
+                
             stream_content = {'name': 'stdout', 'text': solution}
             self.send_response(self.iopub_socket, 'stream', stream_content)
             
@@ -34,3 +49,6 @@ class janssasskernel(Kernel):
                 'payload': [],
                 'user_expressions': {},
                }
+
+    def do_shutdown(self, restart):
+        shutil.rmtree(workingdir)

@@ -3,6 +3,8 @@
 ![Logo](janssasskernel/logo-svg.svg)
 
 A simple jupyter kernel implementation to play around with [Sass](https://sass-lang.com).
+Defaults to sass indented input. You can use ```%%scss``` and ```%%sass``` cell magic
+to choose your style of syntax.
 
 ## Dev Installation
 
