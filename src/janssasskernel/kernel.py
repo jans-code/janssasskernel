@@ -11,8 +11,8 @@ class janssasskernel(Kernel):
     language = 'sass'
     language_version = '1.58.1'
     language_info = {
-        'name': 'Sass',
-        'mimetype': 'text/css',
+        'name': 'SCSS',
+        'mimetype': 'text/plain',
         'file_extension': '.scss',
     }
     banner = "Syntactically Awesome Stylesheets"
@@ -51,4 +51,5 @@ class janssasskernel(Kernel):
                }
 
     def do_shutdown(self, restart):
-        shutil.rmtree(workingdir)
+        if os.path.exists(workingdir):
+            shutil.rmtree(workingdir)
